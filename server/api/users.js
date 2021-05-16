@@ -33,14 +33,11 @@ const schema = Joi.object({
 
 function add(req, res){
     //
-    var username = req.body.username;
-    var email = req.body.email.toLowerCase();
-    var phone_number = req.body.phone_number;
-    var salt =  bcrypt.hashSync(req.body.salt.toString(),  bcrypt.genSaltSync(10));
+    var salt =  bcrypt.hashSync(req.body.password.toString(),  bcrypt.genSaltSync(10));
+    req.body.password = salt
 
-
-    const { error } = schema.validate(req.body);
-    if (error) return _response.apiFailed(res ,error.details[0].message)
+   // const { error } = schema.validate(req.body);
+   // if (error) return _response.apiFailed(res ,error.details[0].message)
 
     db.query("SELECT * FROM `users` WHERE email = '"+email+"' OR phone_number = '"+phone_number+"'", (err, result) =>{
         if (!result.length){
