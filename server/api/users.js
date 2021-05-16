@@ -70,7 +70,8 @@ async function list(req ,res ){
         });
 
 
-    }else {
+    }
+    else {
         db.query("SELECT * FROM user LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
@@ -85,7 +86,7 @@ async function list(req ,res ){
 }
 
 function update(req ,res ){
-    var formData = []
+
 
     if (req.params.id){
         db.query("SELECT * FROM `user` WHERE id='"+req.params.id+"'", (err, result) => {
