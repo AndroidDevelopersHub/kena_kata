@@ -15,48 +15,22 @@ const commonServe = require('../common/services/commonServices')
 
 
 module.exports = function (router) {
-    router.get('/user', list);
-    router.post('/user', add);
-    router.put('/user/:id', update);
-    router.get('/user/:id', details);
-    router.delete('/user/:id', _delete);
+    router.get('/users', list);
+    router.post('/users', add);
+    router.put('/users/:id', update);
+    router.get('/users/:id', details);
+    router.delete('/users/:id', _delete);
 }
 
 
-const schema = Joi.object({
-    username: Joi.string().min(6).required(),
-    email: Joi.string().email().required(),
-    phone_number: Joi.string().min(11).required(),
-    salt: Joi.string().required(),
-    //token: Joi.string().required()
-});
-
 function add(req, res){
-    //
-    var salt =  bcrypt.hashSync(req.body.password.toString(),  bcrypt.genSaltSync(10));
-    req.body.password = salt
-
-   // const { error } = schema.validate(req.body);
-   // if (error) return _response.apiFailed(res ,error.details[0].message)
-
-    db.query("SELECT * FROM `user` WHERE email = '"+req.body.email+"' OR phone_number = '"+req.body.phone_number+"'", (err, result) =>{
-        if (!result.length){
-            console.log('User not exist')
-            db.query("INSERT INTO user SET ?", req.body , (err, result) => {
-                if (!err) {
-                    return _response.apiSuccess(res, responsemsg.useraveSuccess , result)
-                } else {
-                    return _response.apiFailed(res, err , result)
-                }
-            });
-
-        }else {
-            return _response.apiWarning(res, responsemsg.userAlreadyExist)
+    db.query("INSERT INTO user SET ?", req.body , (err, result) => {
+        if (!err) {
+            return _response.apiSuccess(res, responsemsg.userSaveSuccess , result)
+        } else {
+            return _response.apiFailed(res, err , result)
         }
-    })
-
-
-
+    });
 }
 
 async function list(req ,res ){
@@ -88,7 +62,7 @@ async function list(req ,res ){
 
         db.query("SELECT * FROM user WHERE CONCAT(username, email,phone_number) REGEXP '"+req.query.search_string+"'  LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err && result.length > 0) {
-                return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result,{page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
+                return _response.apiSuccess(res, result.length+" "+responsemsg.found , result,{page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
             } else {
                 return _response.apiFailed(res, responsemsg.userListIsEmpty)
