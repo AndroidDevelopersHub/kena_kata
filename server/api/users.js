@@ -15,11 +15,11 @@ const commonServe = require('../common/services/commonServices')
 
 
 module.exports = function (router) {
-    router.get('/users', list);
-    router.post('/users', add);
-    router.put('/users/:id', update);
-    router.get('/users/:id', details);
-    router.delete('/users/:id', _delete);
+    router.get('/user', list);
+    router.post('/user', add);
+    router.put('/user/:id', update);
+    router.get('/user/:id', details);
+    router.delete('/user/:id', _delete);
 }
 
 
@@ -39,12 +39,12 @@ function add(req, res){
    // const { error } = schema.validate(req.body);
    // if (error) return _response.apiFailed(res ,error.details[0].message)
 
-    db.query("SELECT * FROM `users` WHERE email = '"+req.body.email+"' OR phone_number = '"+req.body.phone_number+"'", (err, result) =>{
+    db.query("SELECT * FROM `user` WHERE email = '"+req.body.email+"' OR phone_number = '"+req.body.phone_number+"'", (err, result) =>{
         if (!result.length){
             console.log('User not exist')
-            db.query("INSERT INTO users SET ?", req.body , (err, result) => {
+            db.query("INSERT INTO user SET ?", req.body , (err, result) => {
                 if (!err) {
-                    return _response.apiSuccess(res, responsemsg.userSaveSuccess , result)
+                    return _response.apiSuccess(res, responsemsg.useraveSuccess , result)
                 } else {
                     return _response.apiFailed(res, err , result)
                 }
@@ -73,7 +73,7 @@ async function list(req ,res ){
     var offset = (page - 1) * limit
 
 
-    db.query("SELECT COUNT(*) AS total FROM users", (err, result) => {
+    db.query("SELECT COUNT(*) AS total FROM user", (err, result) => {
         if (!err) {
             totalDocs = result[0].total
         } else {
@@ -86,7 +86,7 @@ async function list(req ,res ){
     //Search by String
     if (req.query.search_string && req.query.search_string !== ''){
 
-        db.query("SELECT * FROM users WHERE CONCAT(username, email,phone_number) REGEXP '"+req.query.search_string+"'  LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+        db.query("SELECT * FROM user WHERE CONCAT(username, email,phone_number) REGEXP '"+req.query.search_string+"'  LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err && result.length > 0) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.redeemFound , result,{page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
@@ -97,7 +97,7 @@ async function list(req ,res ){
 
 
     }else {
-        db.query("SELECT * FROM users LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
+        db.query("SELECT * FROM user LIMIT "+limit+" OFFSET "+offset+" ", (err, result) => {
             if (!err) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
@@ -114,10 +114,10 @@ function update(req ,res ){
     var formData = []
 
     if (req.params.id){
-        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+        db.query("SELECT * FROM `user` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!err && result.length > 0) {
 
-                db.query("UPDATE users SET ? WHERE id = '"+req.params.id+"'" , req.body ,(err , result) =>{
+                db.query("UPDATE user SET ? WHERE id = '"+req.params.id+"'" , req.body ,(err , result) =>{
                     if (!err){
                         return _response.apiSuccess(res, responsemsg.userUpdateSuccess)
                     }else{
@@ -139,7 +139,7 @@ function update(req ,res ){
 function details(req ,res ){
     //const result = bcrypt.compareSync('123', hash);
     if (req.params.id){
-        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+        db.query("SELECT * FROM `user` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!err && result.length > 0) {
                 return _response.apiSuccess(res, result.length+" "+responsemsg.userFound ,result)
             } else {
@@ -154,11 +154,11 @@ function details(req ,res ){
 function _delete(req ,res){
 
     if (req.params.id){
-        db.query("SELECT * FROM `users` WHERE id='"+req.params.id+"'", (err, result) => {
+        db.query("SELECT * FROM `user` WHERE id='"+req.params.id+"'", (err, result) => {
             if (!result.length){
                 return _response.apiWarning(res, responsemsg.userListIsEmpty)
             }else {
-                db.query("DELETE FROM `users` WHERE id='" + req.params.id + "'", (err, result) => {
+                db.query("DELETE FROM `user` WHERE id='" + req.params.id + "'", (err, result) => {
                     if (!err) {
                         return _response.apiSuccess(res, responsemsg.userDeleteSuccess)
                     } else {
