@@ -77,7 +77,7 @@ async function list(req ,res ){
                 return _response.apiSuccess(res, result.length+" "+responsemsg.userFound , result , {page: parseInt(page) , limit: parseInt(limit),totalDocs: totalDocs })
 
             } else {
-                return _response.apiFailed(res, responsemsg.userListIsEmpty )
+                return _response.apiFailed(res, err)
             }
         });
     }
